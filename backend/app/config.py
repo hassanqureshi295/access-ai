@@ -32,6 +32,22 @@ class Settings(BaseSettings):
         description="OpenAI model identifier",
     )
 
+    # Gemini
+    gemini_api_key: str = Field(
+        default="",
+        description="API key for Google Gemini chat completions",
+    )
+    gemini_model: str = Field(
+        default="gemini-1.5-flash",
+        description="Gemini model identifier",
+    )
+
+    # Which provider the /chat route uses: "gemini" | "openai"
+    ai_provider: str = Field(
+        default="gemini",
+        description="Which AI provider to use for chat completions",
+    )
+
     # Server
     host: str = Field(default="0.0.0.0", description="Uvicorn bind host")
     port: int = Field(default=8000, ge=1, le=65535, description="Uvicorn bind port")
@@ -93,6 +109,21 @@ class Settings(BaseSettings):
         if not key or key.startswith("sk-your-"):
             raise ValueError(
                 "OPENAI_API_KEY is not configured. "
+                "Copy backend/.env.example to backend/.env and set a valid key."
+            )
+
+    def validate_gemini_key(self) -> None:
+        """
+        Ensure Gemini API key is configured before chat routes run.
+
+        Raises:
+            ValueError: If the key is missing or still a placeholder.
+        """
+        key = self.gemini_api_key.strip()
+        placeholders = ("your-gemini", "gemini-api-key", "paste-your")
+        if not key or any(p in key.lower() for p in placeholders):
+            raise ValueError(
+                "GEMINI_API_KEY is not configured. "
                 "Copy backend/.env.example to backend/.env and set a valid key."
             )
 

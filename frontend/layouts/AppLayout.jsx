@@ -1,8 +1,5 @@
 /**
- * AppLayout — shared dashboard shell with responsive sidebar.
- *
- * Wraps Dashboard, History, and Settings pages with navigation,
- * user profile, and a mobile-friendly collapsible sidebar.
+ * AppLayout — Cursor-inspired monochrome dashboard shell.
  */
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
@@ -14,41 +11,31 @@ import {
   LogOut,
   Menu,
   X,
-  Sparkles,
   Moon,
   Sun,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 
-/** Sidebar navigation items */
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/history", label: "History", icon: History },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
-/**
- * Single sidebar navigation link with active state styling.
- */
 function SidebarLink({ to, label, icon: Icon, onClick }) {
   return (
     <NavLink
       to={to}
       onClick={onClick}
-      className={({ isActive }) =>
-        isActive ? "sidebar-link-active" : "sidebar-link"
-      }
+      className={({ isActive }) => (isActive ? "sidebar-link-active" : "sidebar-link")}
     >
-      <Icon className="w-5 h-5 shrink-0" />
+      <Icon className="w-4 h-4 shrink-0" strokeWidth={1.5} />
       <span>{label}</span>
     </NavLink>
   );
 }
 
-/**
- * Dashboard layout with sidebar and main content area.
- */
 function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
@@ -64,71 +51,51 @@ function AppLayout() {
 
   const sidebarContent = (
     <>
-      {/* Brand header */}
-      <div className="flex items-center gap-3 px-4 py-6 border-b border-slate-200/60 dark:border-slate-700/60">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-brand shadow-glow">
-          <Sparkles className="w-5 h-5 text-white" />
-        </div>
-        <div>
-          <h1 className="text-lg font-bold text-slate-800 dark:text-white">AccessAI</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Improve Access</p>
-        </div>
+      <div className="px-4 py-6 border-b border-surface-border-dark">
+        <p className="text-xs font-semibold uppercase tracking-widest text-ink-inverse">AccessAI</p>
+        <p className="text-xs text-neutral-500 mt-1">Improve Access</p>
       </div>
 
-      {/* Navigation links */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-2 py-4 space-y-0.5">
         {NAV_ITEMS.map((item) => (
-          <SidebarLink
-            key={item.to}
-            {...item}
-            onClick={closeSidebar}
-          />
+          <SidebarLink key={item.to} {...item} onClick={closeSidebar} />
         ))}
       </nav>
 
-      {/* Footer: theme toggle + user + logout */}
-      <div className="px-3 py-4 border-t border-slate-200/60 dark:border-slate-700/60 space-y-3">
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className="sidebar-link w-full"
-          aria-label="Toggle dark mode"
-        >
-          {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          <span>{isDark ? "Light Mode" : "Dark Mode"}</span>
+      <div className="px-2 py-4 border-t border-surface-border-dark space-y-1">
+        <button type="button" onClick={toggleTheme} className="sidebar-link w-full" aria-label="Toggle theme">
+          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          <span>{isDark ? "Light mode" : "Dark mode"}</span>
         </button>
 
         {user && (
-          <div className="px-4 py-3 rounded-xl bg-brand-50/80 dark:bg-slate-700/40">
-            <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">
-              {user.name}
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-              {user.email}
-            </p>
+          <div className="px-3 py-3 rounded-lg border border-surface-border-light bg-surface-card mt-2">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center text-sm font-semibold shrink-0">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+              </div>
+            </div>
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="sidebar-link w-full text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
-        >
-          <LogOut className="w-5 h-5" />
-          <span>Log Out</span>
+        <button type="button" onClick={handleLogout} className="sidebar-link w-full">
+          <LogOut className="w-4 h-4" />
+          <span>Log out</span>
         </button>
       </div>
     </>
   );
 
   return (
-    <div className="flex min-h-screen bg-surface-muted dark:bg-surface-dark">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-72 glass-strong border-r border-slate-200/40 dark:border-slate-700/40">
+    <div className="flex min-h-screen bg-canvas-dark">
+      <aside className="hidden lg:flex flex-col w-60 border-r border-surface-border-dark bg-canvas-dark">
         {sidebarContent}
       </aside>
 
-      {/* Mobile sidebar overlay */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
@@ -136,20 +103,20 @@ function AppLayout() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+              className="fixed inset-0 z-40 bg-black/80 lg:hidden"
               onClick={closeSidebar}
             />
             <motion.aside
-              initial={{ x: -280 }}
+              initial={{ x: -240 }}
               animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-50 flex flex-col w-72 glass-strong lg:hidden"
+              exit={{ x: -240 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-y-0 left-0 z-50 flex flex-col w-60 bg-canvas-dark border-r border-surface-border-dark lg:hidden"
             >
               <button
                 type="button"
                 onClick={closeSidebar}
-                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="absolute top-4 right-4 p-1 text-neutral-400 hover:text-ink-inverse"
                 aria-label="Close sidebar"
               >
                 <X className="w-5 h-5" />
@@ -160,25 +127,19 @@ function AppLayout() {
         )}
       </AnimatePresence>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile top bar */}
-        <header className="flex items-center gap-4 px-4 py-3 glass border-b border-slate-200/40 dark:border-slate-700/40 lg:hidden">
+        <header className="flex items-center gap-4 px-4 py-3 border-b border-surface-border-dark lg:hidden">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-700"
+            className="p-2 text-neutral-400 hover:text-ink-inverse"
             aria-label="Open sidebar"
           >
-            <Menu className="w-6 h-6 text-brand-600 dark:text-brand-400" />
+            <Menu className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-brand-600 dark:text-brand-400" />
-            <span className="font-bold text-slate-800 dark:text-white">AccessAI</span>
-          </div>
+          <span className="text-xs font-semibold uppercase tracking-widest text-ink-inverse">AccessAI</span>
         </header>
 
-        {/* Page content rendered by React Router */}
         <main className="flex-1 overflow-auto">
           <Outlet />
         </main>

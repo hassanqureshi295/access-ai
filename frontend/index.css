@@ -1,8 +1,6 @@
 /**
- * AccessAI global styles
- *
- * Tailwind layers plus reusable glassmorphism utilities,
- * markdown prose for AI chat, and custom scrollbar styling.
+ * AccessAI — Cursor-inspired monochrome design system.
+ * ~80% black / ~20% white. Dark-first, theme-independent components.
  */
 
 @tailwind base;
@@ -10,159 +8,174 @@
 @tailwind utilities;
 
 @layer base {
-  /* Smooth scrolling and full-height layout */
   html {
     scroll-behavior: smooth;
   }
 
   body {
-    @apply min-h-screen bg-surface-muted text-slate-800 font-sans antialiased;
-    @apply dark:bg-surface-dark dark:text-slate-100;
+    @apply min-h-screen font-sans antialiased tracking-snug;
+    @apply bg-canvas-dark text-ink-inverse;
   }
 
-  /* Focus ring for keyboard accessibility */
   *:focus-visible {
-    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-white;
-    @apply dark:ring-offset-surface-dark;
+    @apply outline-none ring-1 ring-white ring-offset-2 ring-offset-black;
   }
 }
 
 @layer components {
-  /* Glassmorphism card — spec UI requirement */
-  .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-glass;
-    @apply dark:bg-slate-800/60 dark:border-slate-700/40;
+  /* ── Surfaces (80% dark) ── */
+  .panel {
+    @apply rounded-lg border border-surface-border-dark bg-surface-dark;
   }
 
-  .glass-strong {
-    @apply bg-white/85 backdrop-blur-lg border border-white/30 shadow-glass-lg;
-    @apply dark:bg-slate-800/80 dark:border-slate-600/50;
+  .panel-raised {
+    @apply rounded-lg border border-surface-border-dark bg-surface-raised-dark;
   }
 
-  /* Primary gradient button */
+  .surface-card {
+    @apply rounded-xl border border-surface-border-dark bg-surface-card;
+    @apply hover:border-surface-border-light transition-colors duration-150;
+  }
+
+  /* ── Buttons (20% white accent) ── */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl;
-    @apply bg-gradient-brand text-white font-semibold shadow-glow;
-    @apply hover:shadow-glow-lg hover:scale-[1.02] active:scale-[0.98];
-    @apply transition-all duration-300 ease-smooth;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg;
+    @apply bg-white text-black border border-white;
+    @apply hover:bg-neutral-200 active:bg-neutral-300;
+    @apply transition-colors duration-150;
+    @apply disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none;
   }
 
-  /* Secondary outline button */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl;
-    @apply border-2 border-brand-500 text-brand-600 font-semibold;
-    @apply hover:bg-brand-50 active:scale-[0.98];
-    @apply dark:border-brand-400 dark:text-brand-300 dark:hover:bg-brand-950/50;
-    @apply transition-all duration-300 ease-smooth;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg;
+    @apply bg-transparent text-white border border-surface-border-light;
+    @apply hover:bg-white hover:text-black hover:border-white;
+    @apply transition-colors duration-150;
   }
 
-  /* Rounded feature card with hover lift */
-  .feature-card {
-    @apply glass rounded-3xl p-6 transition-all duration-300 ease-smooth;
-    @apply hover:shadow-card-hover hover:-translate-y-1;
+  .btn-icon {
+    @apply inline-flex items-center justify-center shrink-0 rounded-lg;
+    @apply w-11 h-11 bg-white text-black border border-white;
+    @apply hover:bg-neutral-200 active:bg-neutral-300;
+    @apply transition-colors duration-150;
+    @apply disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none;
   }
 
-  /* Input field styling */
+  /* Category / filter chips */
+  .chip {
+    @apply px-3 py-1.5 text-xs font-medium uppercase tracking-wider rounded-lg border;
+    @apply border-surface-border-light text-neutral-300 bg-surface-card;
+    @apply hover:border-white hover:text-white transition-colors duration-150;
+  }
+
+  .chip-active {
+    @apply bg-white text-black border-white;
+  }
+
+  /* ── Inputs (dark surface, visible border) ── */
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/80;
-    @apply placeholder:text-slate-400 text-slate-800;
-    @apply focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20;
-    @apply dark:bg-slate-800/60 dark:border-slate-600 dark:text-slate-100;
-    @apply dark:placeholder:text-slate-500 dark:focus:border-brand-400;
-    @apply transition-colors duration-200;
+    @apply w-full px-4 py-2.5 text-sm rounded-xl;
+    @apply bg-surface-card text-white placeholder:text-neutral-500;
+    @apply border border-surface-border-light;
+    @apply focus:border-white focus:outline-none focus:ring-0;
+    @apply transition-colors duration-150;
   }
 
-  /* AI chat markdown content */
+  /* Chat composer — rounded modern bar */
+  .chat-bar {
+    @apply flex items-end gap-2 p-2 rounded-2xl;
+    @apply border border-surface-border-light bg-surface-card;
+    @apply focus-within:border-white transition-colors duration-150;
+  }
+
+  .chat-input {
+    @apply flex-1 resize-none bg-transparent text-sm text-white;
+    @apply placeholder:text-neutral-500;
+    @apply border-0 outline-none ring-0 focus:ring-0;
+    @apply min-h-[44px] max-h-32 py-2.5 px-3;
+  }
+
+  /* Feature / content card */
+  .feature-card {
+    @apply surface-card p-6;
+  }
+
+  /* Prompt suggestion tile */
+  .prompt-card {
+    @apply text-left p-4 rounded-xl border border-surface-border-dark bg-surface-card;
+    @apply text-sm text-neutral-400;
+    @apply hover:border-surface-border-light hover:bg-surface-raised-dark hover:text-white;
+    @apply transition-colors duration-150;
+  }
+
+  /* Chat markdown */
   .chat-markdown {
-    @apply max-w-none text-slate-700 dark:text-slate-200 leading-relaxed;
-  }
-
-  .chat-markdown p {
-    @apply my-2;
+    @apply max-w-none text-sm leading-relaxed text-neutral-300;
   }
 
   .chat-markdown h2 {
-    @apply text-lg font-bold mt-4 mb-2 text-brand-700 dark:text-brand-300;
+    @apply text-sm font-semibold uppercase tracking-wide mt-5 mb-2 text-white;
   }
 
-  .chat-markdown ul {
-    @apply list-disc pl-5 space-y-1 my-2;
-  }
-
-  .chat-markdown ol {
-    @apply list-decimal pl-5 space-y-1 my-2;
-  }
+  .chat-markdown p { @apply my-2; }
+  .chat-markdown ul { @apply list-disc pl-5 space-y-1 my-2; }
+  .chat-markdown ol { @apply list-decimal pl-5 space-y-1 my-2; }
 
   .chat-markdown a {
-    @apply text-brand-600 underline hover:text-brand-700 dark:text-brand-400;
+    @apply underline underline-offset-2 text-white hover:opacity-70;
   }
 
   .chat-markdown strong {
-    @apply font-semibold text-slate-900 dark:text-slate-100;
+    @apply font-semibold text-white;
   }
 
-  /* Sidebar navigation link */
+  /* Sidebar links */
   .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600;
-    @apply hover:bg-brand-50 hover:text-brand-600;
-    @apply dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-brand-300;
-    @apply transition-colors duration-200;
+    @apply flex items-center gap-3 px-3 py-2 text-sm rounded-lg;
+    @apply text-neutral-400 hover:text-white hover:bg-surface-card;
+    @apply transition-colors duration-150;
   }
 
   .sidebar-link-active {
-    @apply sidebar-link bg-brand-100 text-brand-700 font-semibold;
-    @apply dark:bg-brand-900/40 dark:text-brand-300;
+    @apply sidebar-link text-black font-medium bg-white;
+  }
+
+  /* Section label */
+  .section-label {
+    @apply text-xs font-medium uppercase tracking-widest text-neutral-500;
+  }
+
+  /* Alert — monochrome */
+  .alert-error {
+    @apply flex items-start gap-3 p-3 text-sm rounded-lg;
+    @apply border border-surface-border-light bg-surface-card text-neutral-200;
+  }
+
+  /* White accent strip — for 20% contrast sections */
+  .accent-strip {
+    @apply border-y border-surface-border-light bg-surface-dark;
   }
 }
 
 @layer utilities {
-  /* Gradient text for hero headings */
-  .text-gradient {
-    @apply bg-gradient-brand bg-clip-text text-transparent;
-  }
+  .text-balance { text-wrap: balance; }
 
-  /* Hide scrollbar but keep scroll functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Stagger animation delays for lists */
-  .stagger-1 { animation-delay: 0.1s; }
-  .stagger-2 { animation-delay: 0.2s; }
-  .stagger-3 { animation-delay: 0.3s; }
-  .stagger-4 { animation-delay: 0.4s; }
-  .stagger-5 { animation-delay: 0.5s; }
-  .stagger-6 { animation-delay: 0.6s; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
 }
 
-/* Custom scrollbar — webkit browsers */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-slate-100 dark:bg-slate-800;
-}
-
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
 ::-webkit-scrollbar-thumb {
-  @apply bg-brand-300 rounded-full hover:bg-brand-400;
-  @apply dark:bg-brand-600 dark:hover:bg-brand-500;
+  @apply bg-neutral-700 rounded-full;
 }
 
-/* Reduced motion — respect user preference */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

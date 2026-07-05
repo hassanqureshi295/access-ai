@@ -1,8 +1,9 @@
 """
-OpenAI chat completion service for AccessAI.
+OpenAI-compatible chat completion service for AccessAI.
 
 Handles API calls, error translation, and conversion of model output
-into structured ChatResponse objects.
+into structured ChatResponse objects. Works with OpenAI directly, or
+any OpenAI-compatible provider (e.g. Groq) via base_url override.
 """
 
 from typing import Optional
@@ -25,7 +26,7 @@ logger = get_logger(__name__)
 
 
 class OpenAIServiceError(Exception):
-    """Raised when the OpenAI API returns an error or is misconfigured."""
+    """Raised when the OpenAI-compatible API returns an error or is misconfigured."""
 
     def __init__(self, message: str, status_code: int = 502):
         self.message = message
@@ -38,7 +39,8 @@ class OpenAIService:
     Wrapper around the OpenAI Python SDK for AccessAI chat requests.
 
     Instantiates a client from application settings and exposes a single
-    generate_chat_response method used by the /chat route.
+    generate_chat_response method used by the /chat route. Points at Groq's
+    OpenAI-compatible endpoint via base_url.
     """
 
     def __init__(self, settings: Optional[Settings] = None):
@@ -56,11 +58,14 @@ class OpenAIService:
         """Lazy-initialize the async OpenAI client on first use."""
         if self._client is None:
             self.settings.validate_openai_key()
-            self._client = AsyncOpenAI(api_key=self.settings.openai_api_key)
+            self._client = AsyncOpenAI(
+                api_key=self.settings.openai_api_key,
+                base_url="https://api.groq.com/openai/v1",
+            )
         return self._client
 
     def is_configured(self) -> bool:
-        """Return True if a non-placeholder OpenAI API key is set."""
+        """Return True if a non-placeholder API key is set."""
         key = self.settings.openai_api_key.strip()
         return bool(key) and not key.startswith("sk-your-")
 
@@ -71,7 +76,7 @@ class OpenAIService:
         chat_id: Optional[str] = None,
     ) -> ChatResponse:
         """
-        Send a user message to OpenAI and return a structured ChatResponse.
+        Send a user message to the AI provider and return a structured ChatResponse.
 
         Args:
             user_message: Raw text from the user chat input.
@@ -90,10 +95,13 @@ class OpenAIService:
         final_user_message = build_user_message(user_message, template_key)
 
         logger.info(
-            "Sending chat request to OpenAI model=%s template=%s",
+            "Sending chat request to model=%s template=%s",
             self.settings.openai_model,
             template_key or "none",
         )
+
+        print("DEBUG >>>", repr(self.settings.openai_api_key))
+        print("DEBUG LEN >>>", len(self.settings.openai_api_key))
 
         try:
             completion = await self.client.chat.completions.create(
@@ -106,31 +114,31 @@ class OpenAIService:
                 max_tokens=2048,
             )
         except AuthenticationError as exc:
-            logger.error("OpenAI authentication failed: %s", exc)
+            logger.error("Authentication failed: %s", exc)
             raise OpenAIServiceError(
-                "Invalid OpenAI API key. Check OPENAI_API_KEY in your .env file.",
+                "Invalid API key. Check OPENAI_API_KEY in your .env file.",
                 status_code=401,
             ) from exc
         except RateLimitError as exc:
-            logger.warning("OpenAI rate limit exceeded: %s", exc)
+            logger.warning("Rate limit exceeded: %s", exc)
             raise OpenAIServiceError(
-                "OpenAI rate limit exceeded. Please try again in a few moments.",
+                "Rate limit exceeded. Please try again in a few moments.",
                 status_code=429,
             ) from exc
         except APIConnectionError as exc:
-            logger.error("OpenAI connection error: %s", exc)
+            logger.error("Connection error: %s", exc)
             raise OpenAIServiceError(
-                "Could not connect to OpenAI. Check your network connection.",
+                "Could not connect to the AI provider. Check your network connection.",
                 status_code=503,
             ) from exc
         except APIStatusError as exc:
-            logger.error("OpenAI API status error: %s", exc)
+            logger.error("API status error: %s", exc)
             raise OpenAIServiceError(
-                f"OpenAI API error: {exc.message}",
+                f"API error: {exc.message}",
                 status_code=exc.status_code or 502,
             ) from exc
         except Exception as exc:
-            logger.exception("Unexpected OpenAI error")
+            logger.exception("Unexpected error")
             raise OpenAIServiceError(
                 "An unexpected error occurred while generating the AI response.",
                 status_code=500,
@@ -141,13 +149,13 @@ class OpenAIService:
         content = choice.message.content if choice and choice.message else None
 
         if not content or not content.strip():
-            logger.error("OpenAI returned empty content")
+            logger.error("Provider returned empty content")
             raise OpenAIServiceError(
-                "OpenAI returned an empty response. Please try again.",
+                "The AI provider returned an empty response. Please try again.",
                 status_code=502,
             )
 
-        logger.info("OpenAI response received (%d chars)", len(content))
+        logger.info("Response received (%d chars)", len(content))
 
         return build_chat_response(
             markdown=content.strip(),

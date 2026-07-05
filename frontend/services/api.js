@@ -54,7 +54,7 @@ api.interceptors.response.use(
 
 /**
  * Check backend health status.
- * @returns {Promise<{ status: string, version: string, environment: string, openai_configured: boolean }>}
+ * @returns {Promise<{ status: string, version: string, environment: string, gemini_configured: boolean }>}
  */
 export async function checkHealth() {
   const { data } = await api.get("/health");

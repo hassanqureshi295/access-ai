@@ -40,7 +40,7 @@ async def health_check() -> HealthResponse:
     Return service health status and configuration summary.
 
     Used by load balancers, monitoring, and the frontend to verify
-    the backend is running and OpenAI is configured.
+    the backend is running and the AI provider is configured.
     """
     settings = get_settings()
     openai_service = get_openai_service()
@@ -59,8 +59,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
     Send a user message to the AI assistant and return a structured response.
 
     The response includes Summary, Recommendations, Useful Links, and
-    Action Plan sections parsed from OpenAI markdown output.
- 
+    Action Plan sections parsed from the model's markdown output.
+
     Automatically saves the exchange to chat history.
     """
     openai_service = get_openai_service()

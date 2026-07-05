@@ -114,9 +114,9 @@ class HealthResponse(BaseModel):
     status: str = Field(..., description="Service health status, e.g. 'ok'")
     version: str = Field(..., description="Application version string")
     environment: str = Field(..., description="Current APP_ENV value")
-    openai_configured: bool = Field(
+    gemini_configured: bool = Field(
         ...,
-        description="Whether a valid OpenAI API key is present",
+        description="Whether a valid Gemini API key is present",
     )
 
 

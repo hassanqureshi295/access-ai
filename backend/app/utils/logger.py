@@ -48,7 +48,8 @@ def setup_logging(debug: bool = False, log_level: Optional[str] = None) -> None:
     # Quiet noisy third-party loggers in production
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)
-    logging.getLogger("openai").setLevel(logging.WARNING)
+    logging.getLogger("google").setLevel(logging.WARNING)
+    logging.getLogger("google.generativeai").setLevel(logging.WARNING)
     logging.getLogger("uvicorn.access").setLevel(logging.INFO)
 
     _configured = True

@@ -19,8 +19,7 @@ const THEME_STORAGE_KEY = "accessai-theme";
  */
 function initializeTheme() {
   const saved = localStorage.getItem(THEME_STORAGE_KEY);
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const isDark = saved === "dark" || (saved !== "light" && prefersDark);
+  const isDark = saved !== "light";
 
   document.documentElement.classList.toggle("dark", isDark);
 }
